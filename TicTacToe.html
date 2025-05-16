@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Tic Tac Toe</title>
+  <style>
+    .theme-robotic {
+      background-color: #121212;
+      background-image:
+        linear-gradient(#00ffff22 1px, transparent 1px),
+        linear-gradient(90deg, #00ffff22 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-size: cover;
+      background-position: center;
+      transition: background 0.5s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      color: #0ff;
+    }
+
+    header {
+      background: #111;
+      color: #0ff;
+      font-size: 2.5em;
+      font-weight: 700;
+      padding: 20px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 0 15px #0ff;
+      user-select: none;
+    }
+
+    .top-panel {
+      display: flex;
+      gap: 20px;
+      margin: 20px 0 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .panel-button {
+      background: #111;
+      border: 2px solid #0ff;
+      color: #0ff;
+      font-weight: 600;
+      padding: 12px 25px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.3s, color 0.3s;
+      user-select: none;
+    }
+
+    .panel-button:hover {
+      background: #0ff;
+      color: #111;
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    .options-container {
+      position: absolute;
+      background: #111;
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      margin-top: 10px;
+      padding: 10px;
+      display: none;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1000;
+    }
+
+    .options-container.active {
+      display: flex;
+    }
+
+    .options-container button {
+      background: #222;
+      border: none;
+      color: #0ff;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .options-container button:hover {
+      background: #0ff;
+      color: #111;
+      box-shadow: 0 0 10px #0ff;
+    }
+
+    .cell {
+      background: linear-gradient(145deg, #0ff, #006666);
+      border: 2px solid #00ffff;
+      border-radius: 8px;
+      box-shadow: 0 0 8px #00ffff, inset 0 0 10px #004d4d;
+      color: #001f1f;
+      font-family: 'Orbitron', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 4rem;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .cell:hover {
+      background: linear-gradient(145deg, #33ffff, #009999);
+      color: #001111;
+      box-shadow: 0 0 20px #33ffff, inset 0 0 15px #006666;
+    }
+
+    .cell.played {
+      animation: fadeInZoom 0.3s ease-out;
+    }
+
+    @keyframes fadeInZoom {
+      0% {
+        opacity: 0;
+        transform: scale(0.5);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes pulseGlow {
+      0% {
+        box-shadow: 0 0 15px 5px #0ff;
+      }
+      50% {
+        box-shadow: 0 0 25px 10px #0ff;
+      }
+      100% {
+        box-shadow: 0 0 15px 5px #0ff;
+      }
+    }
+
+
+.invalid-move-board {
+  animation: shakeBoard 0.3s ease-in-out;
+}
+
+@keyframes shakeBoard {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  50% { transform: translateX(10px); }
+  75% { transform: translateX(-10px); }
+  100% { transform: translateX(0); }
+}
+
+    .game-container {
+      display: flex;
+      gap: 50px;
+      justify-content: center;
+      width: 100%;
+      max-width: 1200px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 110px);
+      grid-template-rows: repeat(3, 110px);
+      gap: 15px;
+      background: #111;
+      padding: 25px;
+      border-radius: 20px;
+      box-shadow: 0 0 30px #0ff inset;
+      user-select: none;
+      width: 360px;
+      height: 360px;
+    }
+
+    .scoreboard {
+      background: #111;
+      padding: 20px;
+      border-radius: 10px;
+      border: 2px solid #0ff;
+      box-shadow: 0 0 20px #0ff;
+      text-align: center;
+      font-size: 1.3rem;
+      color: #0ff;
+      font-weight: 700;
+      min-width: 250px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 30px;
+    }
+
+    .scoreboard p {
+      margin: 10px 0;
+    }
+
+    .scoreboard .label {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0ff;
+    }
+
+    #status {
+      margin-top: 25px;
+      font-size: 1.3rem;
+      font-weight: 700;
+      min-height: 1.5em;
+      text-shadow: 0 0 5px #0ff;
+    }
+
+    .game-container {
+      display: flex;
+      gap: 20px;
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet" />
+</head>
+<body class="theme-robotic">
+  <header>Tic Tac Toe</header>
+
+  <div class="top-panel">
+    <div style="position:relative;">
+      <button class="panel-button" onclick="toggleOptions('modeOptions')">Select Mode</button>
+      <div id="modeOptions" class="options-container">
+        <button onclick="setMode('friend')">Play with Friend</button>
+        <button onclick="setMode('computer')">Play with Computer</button>
+      </div>
+    </div>
+    <div style="position:relative;">
+      <button class="panel-button" onclick="toggleOptions('levelOptions')">Select Level</button>
+      <div id="levelOptions" class="options-container">
+        <button onclick="setLevel('easy')">Easy</button>
+        <button onclick="setLevel('moderate')">Moderate</button>
+        <button onclick="setLevel('hard')">Difficult</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-container">
+    <div class="board" id="board"></div>
+    <div class="scoreboard">
+      <p class="label">Scoreboard</p>
+      <p>Player X: <span id="scoreX">0</span></p>
+      <p>Player O: <span id="scoreO">0</span></p>
+      <p>Draws: <span id="draws">0</span></p>
+    </div>
+  </div>
+  <p id="status"></p>
+  <button class="panel-button" onclick="resetGame()">Restart Game</button>
+
+  <script>
+  const board = document.getElementById('board');
+  const statusText = document.getElementById('status');
+  const scoreX = document.getElementById('scoreX');
+  const scoreO = document.getElementById('scoreO');
+  const draws = document.getElementById('draws');
+  
+  let cells = [];
+  let currentPlayer = 'X';
+  let gameActive = false;
+  let gameMode = 'friend';
+  let difficulty = 'easy';
+  let playerXWins = 0;
+  let playerOWins = 0;
+  let totalDraws = 0;
+  let gridSize = 3;  // Default grid size (3x3)
+
+  function toggleOptions(id) {
+    document.querySelectorAll('.options-container').forEach(c => {
+      if (c.id !== id) c.classList.remove('active');
+    });
+    document.getElementById(id).classList.toggle('active');
+  }
+
+  function setMode(mode) {
+    gameMode = mode;
+    document.getElementById('modeOptions').classList.remove('active');
+    resetGame();
+  }
+
+  function setLevel(level) {
+    difficulty = level;
+    document.getElementById('levelOptions').classList.remove('active');
+    resetGame();
+  }
+
+  function setGridSize(size) {
+    gridSize = size;
+    resetGame();
+  }
+
+  function createBoard() {
+    board.innerHTML = '';
+    cells = [];
+    const totalCells = gridSize * gridSize;
+
+    for (let i = 0; i < totalCells; i++) {
+      const cell = document.createElement('div');
+      cell.classList.add('cell');
+      cell.addEventListener('click', () => handleClick(i));
+      board.appendChild(cell);
+      cells.push(cell);
+    }
+  }
+
+  function resetGame() {
+    gameActive = true;
+    currentPlayer = 'X';
+    createBoard();
+    statusText.textContent = `Player ${currentPlayer}'s turn`;
+  }
+
+  function handleClick(index) {
+    if (!gameActive || cells[index].textContent !== '') {
+      // Trigger the invalid move animation on the entire board
+      board.classList.add('invalid-move-board');
+  
+      // Remove the animation class after it finishes (reset it for next use)
+      setTimeout(() => {
+        board.classList.remove('invalid-move-board');
+      }, 300); // Match this time with the animation duration
+  
+      return; // Return early to prevent further processing of the move
+    }
+
+    makeMove(index, currentPlayer);
+
+    if (checkWin()) {
+      statusText.textContent = `Player ${currentPlayer} wins!`;
+      updateScore(currentPlayer);
+      gameActive = false;
+    } else if (cells.every(cell => cell.textContent !== '')) {
+      statusText.textContent = 'Draw!';
+      totalDraws++;
+      draws.textContent = totalDraws;
+      gameActive = false;
+    } else {
+      currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+
+      if (gameMode === 'computer' && currentPlayer === 'O') {
+        setTimeout(computerMove, 500);
+      }
+    }
+  }
+
+  function makeMove(index, player) {
+    cells[index].textContent = player;
+  }
+
+  function updateScore(winner) {
+    if (winner === 'X') {
+      playerXWins++;
+      scoreX.textContent = playerXWins;
+    } else if (winner === 'O') {
+      playerOWins++;
+      scoreO.textContent = playerOWins;
+    }
+  }
+
+  function computerMove() {
+    if (!gameActive) return;
+
+    let move;
+    const emptyCells = cells
+      .map((cell, index) => cell.textContent === '' ? index : null)
+      .filter(i => i !== null);
+
+    if (difficulty === 'easy') {
+      move = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    } else if (difficulty === 'moderate') {
+      move = findBestMove('O', false) || emptyCells[Math.floor(Math.random() * emptyCells.length)];
+    } else if (difficulty === 'hard') {
+      move = findBestMove('O', true);
+    }
+
+    makeMove(move, 'O');
+
+    if (checkWin()) {
+      statusText.textContent = `Player O wins!`;
+      updateScore('O');
+      gameActive = false;
+    } else if (cells.every(cell => cell.textContent !== '')) {
+      statusText.textContent = 'Draw!';
+      totalDraws++;
+      draws.textContent = totalDraws;
+      gameActive = false;
+    } else {
+      currentPlayer = 'X';
+      statusText.textContent = `Player ${currentPlayer}'s turn`;
+    }
+  }
+
+  function checkWin() {
+    const wins = getWinningCombinations();
+    return wins.some(([a, b, c]) =>
+      cells[a].textContent &&
+      cells[a].textContent === cells[b].textContent &&
+      cells[a].textContent === cells[c].textContent
+    );
+  }
+
+  function getWinningCombinations() {
+    const combinations = [];
+
+    // Rows
+    for (let i = 0; i < gridSize; i++) {
+      combinations.push(Array.from({ length: gridSize }, (_, j) => i * gridSize + j));
+    }
+
+    // Columns
+    for (let i = 0; i < gridSize; i++) {
+      combinations.push(Array.from({ length: gridSize }, (_, j) => i + j * gridSize));
+    }
+
+    // Diagonals
+    combinations.push(Array.from({ length: gridSize }, (_, i) => i * (gridSize + 1))); // Left to Right diagonal
+    combinations.push(Array.from({ length: gridSize }, (_, i) => (i + 1) * (gridSize - 1))); // Right to Left diagonal
+
+    return combinations;
+  }
+
+  function findBestMove(player, useMinimax) {
+    const opponent = player === 'X' ? 'O' : 'X';
+
+    for (let i = 0; i < gridSize * gridSize; i++) {
+      if (cells[i].textContent === '') {
+        cells[i].textContent = player;
+        if (checkWin()) {
+          cells[i].textContent = '';
+          return i;
+        }
+        cells[i].textContent = '';
+      }
+    }
+
+    for (let i = 0; i < gridSize * gridSize; i++) {
+      if (cells[i].textContent === '') {
+        cells[i].textContent = opponent;
+        if (checkWin()) {
+          cells[i].textContent = '';
+          return i;
+        }
+        cells[i].textContent = '';
+      }
+    }
+
+    if (useMinimax) {
+      let bestScore = -Infinity;
+      let move;
+      for (let i = 0; i < gridSize * gridSize; i++) {
+        if (cells[i].textContent === '') {
+          cells[i].textContent = player;
+          let score = minimax(cells, 0, false);
+          cells[i].textContent = '';
+          if (score > bestScore) {
+            bestScore = score;
+            move = i;
+          }
+        }
+      }
+      return move;
+    }
+
+    return null;
+  }
+
+  function minimax(boardState, depth, isMaximizing) {
+    const winner = checkWinner();
+    if (winner === 'O') return 10 - depth;
+    if (winner === 'X') return depth - 10;
+    if (cells.every(cell => cell.textContent !== '')) return 0;
+
+    const player = isMaximizing ? 'O' : 'X';
+    let bestScore = isMaximizing ? -Infinity : Infinity;
+
+    for (let i = 0; i < gridSize * gridSize; i++) {
+      if (cells[i].textContent === '') {
+        cells[i].textContent = player;
+        const score = minimax(cells, depth + 1, !isMaximizing);
+        cells[i].textContent = '';
+        bestScore = isMaximizing ? Math.max(score, bestScore) : Math.min(score, bestScore);
+      }
+    }
+
+    return bestScore;
+  }
+
+  function checkWinner() {
+    const wins = getWinningCombinations();
+    for (const [a, b, c] of wins) {
+      if (
+        cells[a].textContent &&
+        cells[a].textContent === cells[b].textContent &&
+        cells[a].textContent === cells[c].textContent
+      ) {
+        return cells[a].textContent;
+      }
+    }
+    return null;
+  }
+
+  resetGame();
+</script>
+
+
+</body>
+</html>
